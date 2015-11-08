@@ -1,16 +1,22 @@
 <?php
-
+header("Access-Control-Allow-Origin: *");
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers:accept, content-type');
 header('Content-Type: application/json');
 require_once '/_core/bootstrap.php';
 
 //open db
 require_once __FOLDER_DB . _DS_ . "openDB.php";
 
+//import util
+require_once __FOLDER_UTIL . _DS_ . "inflector.php";
+
 //import plugin
 require_once __FOLDER_PLUGIN . _DS_ . "basic.php";
 
 //import base class
 require_once __FOLDER_CONTROLLER . _DS_ . "Controller.php";
+require_once __FOLDER_MODEL . _DS_ . "Model.php";
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(generate_response(520));
