@@ -5,18 +5,53 @@ class AnggotasController extends Controller {
     function login() {
         $email = $_POST['email'];
         $password = $_POST['password'];
-        $result = $this->db->query(""
-                . "select * from anggotas Anggota "
-                . "where "
-                . "Anggota.email='$email' and Anggota.password='$password'");
-        if ($result->num_rows) {
-            $data = array(
-                "anggota" => buildResult($result->fetch_fields(), $result->fetch_row())
-            );
-            echo json_encode(generate_response(202, null, $data));
+        $data = $this->Anggota->find("first", [
+            "conditions" => [
+                "and" => [
+                    "Anggota.email" => $email,
+                    "Anggota.password" => $password,
+                ]
+            ],
+            "contains" => [
+                "RumahTangga",
+            ]
+        ]);
+        if (!empty($data)) {
+            echo json_encode(generate_response(202, null, ["anggota" => $data['Anggota'], "rumah_tangga" => $data['RumahTangga']]));
         } else {
             echo json_encode(generate_response(402));
         }
     }
 
+    function get() {
+        $id = $_POST['id'];
+        $data = $this->Anggota->find("first", [
+            "conditions" => [
+                "Anggota.id" => $id,
+            ],
+            "contains" => [
+                "RumahTangga" => [
+                    "RumahTanggaStatus",
+                    "Anggota",
+                ],
+                "JenisAnggota",
+                "HubunganAnggota",
+                "Transaksi" => [
+                    "Kategori",
+                ],
+            ]
+        ]);
+        if (!empty($data)) {
+            echo json_encode(generate_response(400, null, $data));
+        } else {
+            echo json_encode(generate_response(401));
+        }
+    }
+
+    function laporan(){
+        $id=$_POST['id'];
+        $jenis=$_POST['jenis'];
+        $tahun=$_POST['tahun'];
+        
+    }
 }
