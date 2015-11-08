@@ -12,6 +12,7 @@ $codeList = array(
     402 => "Login gagal",
     403 => "Invalid request",
     404 => "Akun belum aktif",
+    405 => "Invalid parameter",
     501 => "Invalid controller and function",
     510 => "Controller not found",
     511 => "Function not found",
