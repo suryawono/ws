@@ -46,13 +46,29 @@ class Model {
             $condString = $this->buildCond("or", $options['conditions']);
         }
         $condString = (empty($condString) ? "" : "where ") . $condString;
+        if (!isset($options['fields'])) {
+            $selector = "* $virtualFieldString";
+        } else {
+            $selector = $this->buildFields($options['fields']);
+        }
+        if (!isset($options["joins"]["left"])) {
+            $leftjoin = "";
+        } else {
+            $leftjoin = $this->buildLeftjoin($options["joins"]["left"]);
+        }
+        if (!isset($options["group"])) {
+            $groupby = "";
+        } else {
+            $groupby = $this->buildGroupBy($options["group"]);
+        }
         switch ($type) {
             case "first":
                 $result = $this->db->query(""
-                        . "select * "
-                        . "$virtualFieldString "
+                        . "select $selector"
                         . "from {$this->table} {$this->name} "
+                        . "$leftjoin "
                         . "$condString "
+                        . "$groupby "
                         . "limit 1");
                 $mydata = $r[$this->name] = buildResult($result->fetch_fields(), $result->fetch_row());
                 if (empty($mydata['id'])) {
@@ -61,10 +77,11 @@ class Model {
                 break;
             case "all":
                 $result = $this->db->query(""
-                        . "select * "
-                        . "$virtualFieldString "
+                        . "select $selector "
                         . "from {$this->table} {$this->name} "
-                        . "$condString ");
+                        . "$leftjoin "
+                        . "$condString "
+                        . "$groupby ");
                 $mydata = $r = buildResults($result, $this->name);
                 break;
         }
@@ -158,6 +175,33 @@ class Model {
             }
         }
         return $r;
+    }
+
+    function buildFields($fields) {
+        $fieldString = "";
+        foreach ($fields as $field) {
+            $fieldString.=$field;
+            $fieldString.=" , ";
+        }
+        $fieldString = rtrim($fieldString, ", ");
+        return $fieldString;
+    }
+
+    function buildLeftjoin($leftjoins) {
+        $joinstring = "";
+        foreach ($leftjoins as $leftjoin) {
+            $joinstring.="left join " . Inflector::tableize($leftjoin) . " $leftjoin on $leftjoin.id={$this->name}." . Inflector::underscore($leftjoin) . "_id ";
+        }
+        return $joinstring;
+    }
+
+    function buildGroupBy($groups) {
+        $groupstring = "group by ";
+        foreach ($groups as $group) {
+            $groupstring.=$group . ", ";
+        }
+        $groupstring = rtrim($groupstring, ", ");
+        return $groupstring;
     }
 
     function needAuth() {

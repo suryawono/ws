@@ -48,10 +48,5 @@ class AnggotasController extends Controller {
         }
     }
 
-    function laporan(){
-        $id=$_POST['id'];
-        $jenis=$_POST['jenis'];
-        $tahun=$_POST['tahun'];
-        
-    }
+    
 }
