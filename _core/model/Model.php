@@ -82,7 +82,7 @@ class Model {
                         . "$leftjoin "
                         . "$condString "
                         . "$groupby ");
-                $mydata = $r = buildResults($result, $this->name);
+                $mydata = $r = buildResults($result);
                 break;
         }
         if (isset($options["contains"]) && !empty($mydata)) {

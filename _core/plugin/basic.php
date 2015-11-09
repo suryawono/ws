@@ -51,15 +51,19 @@ function buildResult($fieldsName, $values) {
     return $result;
 }
 
-function buildResults($results,$modelname) {
+function buildResults($results) {
     $result = array();
     $fieldsName = $results->fetch_fields();
     while ($values = $results->fetch_row()) {
-        $r=[];
+        $r = [];
         foreach ($fieldsName as $k => $v) {
-            $r[$v->name] = $values[$k];
+            if (!empty($v->table)) {
+                $r[$v->table][$v->name] = $values[$k];
+            } else {
+                $r[0][$v->name] = $values[$k];
+            }
         }
-        $result[][$modelname]=$r;
+        $result[] = $r;
     }
     return $result;
 }
