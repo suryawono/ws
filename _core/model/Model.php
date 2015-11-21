@@ -8,6 +8,8 @@ class Model {
     var $table;
     var $name;
     var $virtualFields = [];
+    var $id = null;
+    var $data = [];
 
     function __construct() {
         global $mysqli;
@@ -145,8 +147,12 @@ class Model {
                             Inflector::underscore($this->name) . "_id" => $reference_data['id']
                         ]
                     ]);
-                    foreach ($entities as $entity) {
-                        $r[$v][] = $entity[$v];
+                    if (!empty($entities)) {
+                        foreach ($entities as $entity) {
+                            $r[$v][] = $entity[$v];
+                        }
+                    }else{
+                        $r[$v]=[];
                     }
                 }
             } else {
@@ -163,13 +169,17 @@ class Model {
                             Inflector::underscore($this->name) . "_id" => $reference_data['id']
                         ]
                     ]);
-                    foreach ($entities as $entity) {
-                        $eData = $entity[$k];
-                        $m = new $k();
-                        if (!empty($eData)) {
-                            $eData+= $m->buildContain($v, $entity[$k]);
+                    if (!empty($entities)) {
+                        foreach ($entities as $entity) {
+                            $eData = $entity[$k];
+                            $m = new $k();
+                            if (!empty($eData)) {
+                                $eData+= $m->buildContain($v, $entity[$k]);
+                            }
+                            $r[$k][] = $eData;
                         }
-                        $r[$k][] = $eData;
+                    } else {
+                        $r[$k] = [];
                     }
                 }
             }
@@ -202,6 +212,55 @@ class Model {
         }
         $groupstring = rtrim($groupstring, ", ");
         return $groupstring;
+    }
+
+    function buildSaveString($data) {
+        $string = [];
+        $string["field"] = "(";
+        $string["value"] = "(";
+        foreach ($data[$this->name] as $field => $value) {
+            $string["field"].="`$field`,";
+            $string["value"].="'$value',";
+        }
+        $string["field"] = rtrim($string["field"], ",") . ")";
+        $string["value"] = rtrim($string["value"], ",") . ")";
+        return $string;
+    }
+
+    function buildUpdateString($data) {
+        $string = "";
+        foreach ($data[$this->name] as $field => $value) {
+            $string.="`$field`='$value', ";
+        }
+        $string = rtrim($string, ", ");
+        return $string;
+    }
+
+    function save() {
+        if (!is_null($this->id)) {
+            $string = $this->buildUpdateString($this->data);
+            $result = $this->db->query(""
+                    . "update " . $this->table . " set "
+                    . "$string "
+                    . "where `id`={$this->id}");
+        } else {
+            if (!empty($this->data[$this->name])) {
+                $string = $this->buildSaveString($this->data);
+                $result = $this->db->query(""
+                        . "insert into " . $this->table . " "
+                        . "{$string['field']} values {$string['value']}");
+            } else {
+                $result = $this->db->query(""
+                        . "insert into " . $this->table . " "
+                        . "(`id`) values (null)");
+            }
+            $this->id = $this->db->insert_id;
+        }
+        return $result;
+    }
+
+    function getLastInsertID() {
+        return $this->id;
     }
 
     function needAuth() {
