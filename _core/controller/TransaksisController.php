@@ -26,7 +26,7 @@ class TransaksisController extends Controller {
                                 "sum(CASE WHEN Kategori.jenis_kategori_id = 1 THEN Transaksi.besaran ELSE 0 END) as pemasukan",
                                 "sum(CASE WHEN Kategori.jenis_kategori_id = 2 THEN Transaksi.besaran ELSE 0 END) as pengeluaran",
                                 "Year(Transaksi.waktu) as tahun",
-                                "Month(Transaksi.waktu) as bulan"
+                                "Month(Transaksi.waktu) as bulan",
                             ],
                             "group" => [
                                 "Year(Transaksi.waktu)",
@@ -58,4 +58,7 @@ class TransaksisController extends Controller {
         echo json_encode(generate_response($code, null, $data));
     }
 
+    function tambah(){
+        
+    }
 }
