@@ -8,7 +8,7 @@ class AnggotasController extends Controller {
         $this->Anggota->data["Anggota"]["gmail_id"] = $_POST['gmailID'];
         $this->Anggota->data["Anggota"]["nama"] = $_POST['name'];
         $this->Anggota->data["Anggota"]["pp_link"] = $_POST['ppLink'];
-        $this->Anggota->data["Anggota"]["gender"] = $_POST['gender'];
+        $this->Anggota->data["Anggota"]["gender"] = isset($_POST['gender'])?$_POST['gender']:"e";
         $data = $this->Anggota->find("first", [
             "conditions" => [
                 "and" => [
@@ -39,15 +39,31 @@ class AnggotasController extends Controller {
             ],
             "contains" => [
                 "RumahTangga",
+                "JenisAnggota",
             ]
         ]);
         if (!empty($data)) {
-            echo json_encode(generate_response(202, null, ["anggota" => $data['Anggota'], "rumah_tangga" => $data['RumahTangga']]));
+            echo json_encode(generate_response(202, null, ["anggota" => $data['Anggota'], "rumah_tangga" => $data['RumahTangga'],"jenis_anggota"=>$data["JenisAnggota"]]));
         } else {
             echo json_encode(generate_response(402));
         }
     }
 
+    function loginTest(){
+        $data = $this->Anggota->find("first", [
+            "conditions" => [
+                "and" => [
+                    "Anggota.email" => "suryawono@gmail.com",
+                ]
+            ],
+            "contains" => [
+                "RumahTangga",
+                "JenisAnggota",
+            ]
+        ]);
+        echo json_encode(generate_response(202, null, ["anggota" => $data['Anggota'], "rumah_tangga" => $data['RumahTangga'],"jenis_anggota"=>$data["JenisAnggota"]]));
+    }
+    
     function get() {
         $id = $_POST['id'];
         $data = $this->Anggota->find("first", [
@@ -74,7 +90,7 @@ class AnggotasController extends Controller {
     }
 
     function add() {
-        $this->Anggota->data = $_POST['data'];
+        $this->Anggota->data = $this->buildQueryData();
         if ($this->Anggota->save()) {
             echo json_encode(generate_response(200));
         } else {

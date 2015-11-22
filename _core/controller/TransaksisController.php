@@ -58,7 +58,13 @@ class TransaksisController extends Controller {
         echo json_encode(generate_response($code, null, $data));
     }
 
-    function tambah(){
-        
+    function add() {
+        $this->Transaksi->data = $this->buildQueryData();
+        if ($this->Transaksi->save()) {
+            echo json_encode(generate_response(200));
+        } else {
+            echo json_encode(generate_response(101));
+        }
     }
+
 }
