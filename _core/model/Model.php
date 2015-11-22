@@ -151,8 +151,8 @@ class Model {
                         foreach ($entities as $entity) {
                             $r[$v][] = $entity[$v];
                         }
-                    }else{
-                        $r[$v]=[];
+                    } else {
+                        $r[$v] = [];
                     }
                 }
             } else {
