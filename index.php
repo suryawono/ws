@@ -3,7 +3,7 @@ header("Access-Control-Allow-Origin: *");
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers:accept, content-type');
 header('Content-Type: application/json');
-require_once '/_core/bootstrap.php';
+require_once '_core/bootstrap.php';
 
 //open db
 require_once __FOLDER_DB . _DS_ . "openDB.php";

@@ -23,12 +23,8 @@ class AnggotasController extends Controller {
             $this->Anggota->id = $data['Anggota']['id'];
         } else {
             $this->Anggota->RumahTangga->_add();
-            $this->Anggota->data['Anggota']['rumah_tangga_id'] = $this->Anggota->RumahTangga->getLastInsertID();
-        }
-        if (isset($this->Anggota->data['Anggota']['jenis_anggota_id'])) {
-            
-        } else {
             $this->Anggota->data['Anggota']['jenis_anggota_id'] = 1;
+            $this->Anggota->data['Anggota']['rumah_tangga_id'] = $this->Anggota->RumahTangga->getLastInsertID();
         }
         $this->Anggota->save();
         $data = $this->Anggota->find("first", [
